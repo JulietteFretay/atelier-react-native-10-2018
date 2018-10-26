@@ -55,8 +55,8 @@ export default class App extends React.Component {
     }
 
     actionActives= () => {
-            this.setState({filtreActives:true,filtreTerminees:false});
-        }
+         this.setState({filtreActives:true,filtreTerminees:false});
+    }
 
      actionTerminees= () => {
          this.setState({filtreActives:false,filtreTerminees:true});
