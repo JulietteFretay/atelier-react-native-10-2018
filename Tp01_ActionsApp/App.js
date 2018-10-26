@@ -11,10 +11,14 @@ import Menu from './src/menu/Menu'
  */
 export default class App extends React.Component {
 
+
     // état global de l'application
     // il y aura probalement d'autres informations à stocker
     state = {
-        texteSaisie: ''
+        texteSaisie: '',
+        actions: [],
+        filtreActives: false,
+        filtreTerminees: false
     }
 
     /**
@@ -24,27 +28,52 @@ export default class App extends React.Component {
      */
     quandLaSaisieChange(nouvelleSaisie) {
         console.log('la saisie à changée', nouvelleSaisie)
+        this.setState({texteSaisie:nouvelleSaisie})
     }
 
     /**
      * Méthode invoquée lors du clic sur le bouton `Valider`.
      */
     validerNouvelleAction() {
-        console.log('Vous avez cliqué sur Valider !')
+        const action = {
+            texte:this.state.texteSaisie,
+            bool:false
+        }
+        this.setState(prev => ({actions:[...prev.actions,action],texteSaisie:''}))
     }
 
+    terminerAction = indexCourant  => {
+        this.setState(prev => ({actions:prev.actions.map((action,index) => index == indexCourant ? {...action,bool:!action.bool} : action)}))
+    }
+
+    supprimerAction = indexCourant  => {
+        this.setState(prev => ({actions:prev.actions.filter((action,index) => index !== indexCourant)}))
+    }
+
+    actionToutes = () => {
+        this.setState({filtreActives:false,filtreTerminees:false});
+    }
+
+    actionActives= () => {
+            this.setState({filtreActives:true,filtreTerminees:false});
+        }
+
+     actionTerminees= () => {
+         this.setState({filtreActives:false,filtreTerminees:true});
+     }
+
     render() {
-        const {texteSaisie} = this.state
+        const {texteSaisie,actions,filtreTerminees,filtreActives} = this.state
 
         return (
             <View style={styles.conteneur}>
                 <ScrollView keyboardShouldPersistTaps='always' style={styles.content}>
                     <Entete/>
                     <Saisie texteSaisie={texteSaisie} evtTexteModifie={(titre) => this.quandLaSaisieChange(titre)}/>
-                    <ListeActions />
+                    <ListeActions actions={actions} terminerAction={this.terminerAction} supprimerAction={this.supprimerAction} filtreTerminees={filtreTerminees} filtreActives={filtreActives}/>
                     <BoutonCreer onValider={() => this.validerNouvelleAction()}/>
                 </ScrollView>
-                <Menu/>
+                <Menu actionToutes={this.actionToutes} actionActives={this.actionActives} actionTerminees={this.actionTerminees}/>
             </View>
         )
     }
